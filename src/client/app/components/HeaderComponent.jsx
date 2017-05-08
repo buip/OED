@@ -40,6 +40,8 @@ export default function HeaderComponent(props) {
 			<div style={divRightStyle}>
 				<Link style={loginLinkStyle} to="/login"><button className="btn btn-default">Log in</button></Link>
 				<Link style={adminLinkStyle} to="/admin"><button className="btn btn-default">Admin panel</button></Link>
+				<Link to="/va"><button className="btn btn-default">Appliances</button></Link>
+				<Link to="/c"><button className="btn btn-default">Competitions</button></Link>
 			</div>
 		</div>
 	);
