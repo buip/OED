@@ -4,6 +4,9 @@
 
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
+import { IntlProvider, addLocaleData } from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import fr from 'react-intl/locale-data/fr';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
@@ -14,6 +17,7 @@ import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
+import localeData from './../../app/data.json';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
@@ -111,17 +115,26 @@ export default class RouteComponent extends React.Component {
 	 * @returns JSX to create the RouteComponent
 	 */
 	render() {
+		addLocaleData([...en, ...fr]);
+		const language = (navigator.languages && navigator.languages[0]) ||
+							navigator.language ||
+							navigator.userLanguage;
+		const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
+		// Try full locale, try locale without region code, fallback to 'en'
+		const messages = localeData[languageWithoutRegionCode] || localeData[language] || localeData.en;
 		return (
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
-				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} />
-					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
-					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
-					<Route path="*" component={NotFoundComponent} />
-				</Router>
+				<IntlProvider locale={language} messages={messages}>
+					<Router history={browserHistory}>
+						<Route path="/" component={HomeComponent} />
+						<Route path="/login" component={LoginContainer} />
+						<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+						<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
+						<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path="*" component={NotFoundComponent} />
+					</Router>
+				</IntlProvider>
 			</div>
 		);
 	}
